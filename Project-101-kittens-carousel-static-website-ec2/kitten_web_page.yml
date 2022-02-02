@@ -1,0 +1,48 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: |
+  This template launches an EC2 with a security group that enables SSH
+Resources:
+  KittenWebEC2:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: ami-0a8b4cd432b1c3063 # most recent ami id of Amazon Linux2
+      InstanceType: t2.micro
+      KeyName: burakawskey # pem file name without extension
+      SecurityGroups:
+        - !Ref SSHSecurityGroup
+        - !Ref HTMLSecurityGroup
+      UserData: 
+         Fn::Base64:
+                |
+             #!/bin/bash
+             sudo yum update -y
+             sudo yum install httpd -y
+             sudo systemctl status httpd
+             sudo systemctl start httpd
+             sudo systemctl enable httpd
+             sudo chmod -R 777 /var/www/html
+             sudo yum install git -y
+             sudo git clone https://github.com/BurakKoban/Aws-Projects /var/www/html/
+             cp /var/www/html/Kitten_Web/* /var/www/html
+      Tags:
+        - Key: Name
+          Value: Web Server of Kitten Web
+  SSHSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Enable SSH access via port 22
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 22
+        ToPort: 22
+        CidrIp: 0.0.0.0/0
+
+  HTMLSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Enable HTML access via port 80
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 80
+        ToPort: 80
+        CidrIp: 0.0.0.0/0
