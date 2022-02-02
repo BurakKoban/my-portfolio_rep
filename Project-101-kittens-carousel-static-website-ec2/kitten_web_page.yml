@@ -20,10 +20,12 @@ Resources:
              sudo systemctl status httpd
              sudo systemctl start httpd
              sudo systemctl enable httpd
-             sudo chmod -R 777 /var/www/html
-             sudo yum install git -y
-             sudo git clone https://github.com/BurakKoban/Aws-Projects /var/www/html/
-             cp /var/www/html/Kitten_Web/* /var/www/html
+             FOLDER="https://raw.githubusercontent.com/BurakKoban/my-portfolio_rep/main/Project-101-kittens-carousel-static-website-ec2/static-web/"            
+             sudo wget $FOLDER/index.html /var/www/html/
+             sudo wget $FOLDER/cat0.jpg /var/www/html/
+             sudo wget $FOLDER/cat1.jpg /var/www/html/
+             sudo wget $FOLDER/cat2.jpg /var/www/html/
+             sudo wget $FOLDER/cat3.png /var/www/html/
       Tags:
         - Key: Name
           Value: Web Server of Kitten Web
