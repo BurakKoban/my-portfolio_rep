@@ -18,11 +18,12 @@ email VARCHAR);
 data = """
 INSERT INTO users
 VALUES
-	("Tuba", "tuba@amazon.com" ),
-	("Ethan", "ethan@micrasoft.com"),
-	("mostafa", "mostafa@facebook.com"),
-    ("sait", "sait@tesla.com"),
-    ("busra","busra@google");
+	("huseyin", "huseyin@amazon.com" ),
+	("hilal", "hilal@micrasoft.com"),
+	("ayse", "ayse@facebook.com"),
+    ("burak", "burak@tesla.com"),
+    ("etibar", "etibar@ebay.com")
+    ("engin","engin@google");
 """
 
 
@@ -39,7 +40,7 @@ def find_emails(keyword):
     SELECT * FROM users WHERE username like '%{keyword}%';
     """
     result = db.session.execute(query)
-    user_emails = [(row[0], row[1]) for row in result]
+    user_emails = [(row[0], row[1]) for row in result] #list comprehension
     if not any(user_emails):
         user_emails = [("Not Found", "Not Found")]
     return user_emails
@@ -96,4 +97,5 @@ def add_email():
 
 # - Add a statement to run the Flask application which can be reached from any host on port 80.
 if __name__=='__main__':
-    app.run(debug=True)
+   # app.run(debug=True)
+   app.run(host = "0.0.0.0", port=80)
