@@ -35,7 +35,7 @@ VALUES
 	("hilal", "hilal@micrasoft.com"),
 	("ayse", "ayse@facebook.com"),
     ("burak", "burak@tesla.com"),
-    ("etibar", "etibar@ebay.com")
+    ("etibar", "etibar@ebay.com"),
     ("engin","engin@google");
 """
 cursor.execute(drop_table)
