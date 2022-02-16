@@ -1,0 +1,1 @@
+# example : scp -i ~/Download/serdar.pem -r ./* ec2-user@54.88.46.143:/home/ec2-user/
