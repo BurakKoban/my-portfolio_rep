@@ -31,7 +31,7 @@ Resources:
         - Key: Name
           Value: !Sub Web Server of ${AWS::StackName} Stack
       UserData: 
-        Fn::Base64:
+        Fn::Base64: #  intrinsic function
              |
            #!/bin/bash
            yum update -y
