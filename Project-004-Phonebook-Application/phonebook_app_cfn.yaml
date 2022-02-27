@@ -4,8 +4,95 @@ Description: "The Phonebook Application aims to create a phonebook application i
               Instances and Relational Database Service (RDS) using AWS Cloudformation Service."
   
 Parameters:
+  myVPC:
+    Description: Select your VPC
+    Type: AWS::EC2::VPC::Id
+
+  mySubnets:
+    Description: Select at least 2 subnets
+    Type: List<AWS::EC2::Subnet::Id>
   
 Resources:
+  RDSInstance:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      AllocatedStorage: "String"
+      AllowMajorVersionUpgrade: false
+      AssociatedRoles:
+        AssociatedRoles
+      AutoMinorVersionUpgrade: false
+      AvailabilityZone: "String"
+      BackupRetentionPeriod: Number
+      CACertificateIdentifier: "String"
+      CharacterSetName: "String"
+      CopyTagsToSnapshot: false
+      DBClusterIdentifier: "String"
+      DBInstanceClass: "String" # Required
+      DBInstanceIdentifier: "String"
+      DBName: "clarusway_phonebook"
+      DBParameterGroupName: "String"
+      DBSecurityGroups:
+        DBSecurityGroups
+      DBSnapshotIdentifier: "String"
+      DBSubnetGroupName: "String"
+      DeleteAutomatedBackups: false
+      DeletionProtection: false
+      Domain: "String"
+      DomainIAMRoleName: "String"
+      EnableCloudwatchLogsExports:
+        EnableCloudwatchLogsExports
+      EnableIAMDatabaseAuthentication: false
+      EnablePerformanceInsights: false
+      Engine: "String"
+      EngineVersion: "String"
+      Iops: Number
+      KmsKeyId: "String"
+      LicenseModel: "String"
+      MasterUserPassword: "Abcd1234"
+      MasterUsername: "admin"
+      MaxAllocatedStorage: 20
+      MonitoringInterval: Number
+      MonitoringRoleArn: "String"
+      MultiAZ: false
+      OptionGroupName: "String"
+      PerformanceInsightsKMSKeyId: "String"
+      PerformanceInsightsRetentionPeriod: Number
+      Port: 3306
+      PreferredBackupWindow: "String"
+      PreferredMaintenanceWindow: "String"
+      ProcessorFeatures:
+        ProcessorFeatures
+      PromotionTier: Number
+      PubliclyAccessible: false
+      SourceDBInstanceIdentifier: "String"
+      SourceRegion: "String"
+      StorageEncrypted: false
+      StorageType: "String"
+      Tags:
+        Tags
+      Timezone: "String"
+      UseDefaultProcessorFeatures: false
+      VPCSecurityGroups: !Ref RDSSG
+        
+
+  MyALB:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      SecurityGroups:
+        - !GetAtt ASG_EC2SG.GroupId
+      Subnets: !Ref mySubnets
+      Type: application
+  
+  MYListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      DefaultActions: # Required
+        - Type: forward
+          TargetGroupArn: !Ref MyTG
+      LoadBalancerArn: !Ref MyALB # Required
+      Port: 80
+      Protocol: HTTP
+  
   ASG_EC2SG:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -47,8 +134,49 @@ Resources:
           yum update -y
           yum install python3 -y
           pip3 install flask flask-mysql sqlalchemy flask-SQLAlchemy
+          FOLDER="https://raw.githubusercontent.com/BurakKoban/my-portfolio_rep/main/Project-004-Phonebook-Application"
+          wget ${FOLDER}/phonebook-app.py
+          mkdir templates && cd templates 
+          wget ${FOLDER}/index.html
+          wget ${FOLDER}/add-update.html
+          wget ${FOLDER}/delete.html
+          cd .. 
+          python3 phonebook-app.py
+
+
+  MyASG:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      AvailabilityZones: !GetAZs 
+      DesiredCapacity: "2"
+      HealthCheckGracePeriod: 90
+      HealthCheckType: ELB
+      LaunchTemplate:
+        LaunchTemplateId: !Ref EC2LT
+        Version: "1"
+      MaxSize: "3" # Required
+      MinSize: "1" # Required
+      TargetGroupARNs:
+        - !Ref MyTG
+
+  MyTG:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      HealthCheckIntervalSeconds: 10
+      HealthCheckTimeoutSeconds: 5
+      HealthyThresholdCount: 5
+      Port: 80
+      Protocol: HTTP
+      UnhealthyThresholdCount: 3
+      VpcId: !Ref myVPC
   
      
 
 
 Outputs:
+  AppUrl:
+    Description: URL of the ALB
+    Value: !Join 
+       - ''
+       - - 'http://'
+         - !GetAtt MyALB.DNSName
