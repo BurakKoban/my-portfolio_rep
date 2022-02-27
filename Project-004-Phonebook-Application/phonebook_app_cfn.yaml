@@ -1,0 +1,54 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: "The Phonebook Application aims to create a phonebook application in Python and deployed as a web 
+              application with Flask on AWS Application Load Balancer with Auto Scaling Group of Elastic Compute Cloud (EC2) 
+              Instances and Relational Database Service (RDS) using AWS Cloudformation Service."
+  
+Parameters:
+  
+Resources:
+  ASG_EC2SG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: SG allows traffic for SSH and HTML # Required
+      SecurityGroupIngress:
+          - CidrIp: 0.0.0.0/0
+            FromPort: 22
+            IpProtocol: tcp # Required
+            ToPort: 22
+          - CidrIp: 0.0.0.0/0
+            FromPort: 80
+            IpProtocol: tcp # Required
+            ToPort: 80
+
+  RDSSG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: SG allows traffic for MYSQL # Required
+      SecurityGroupIngress:
+          - CidrIp: 0.0.0.0/0
+            FromPort: 3306
+            IpProtocol: tcp # Required
+            ToPort: 3306
+  
+  EC2LT:
+    Type: AWS::EC2::LaunchTemplate
+    Properties:
+      LaunchTemplateData:
+        ImageId: !FindInMap 
+         - RegionImageMap
+         - !Ref AWS::Region
+         - AMI
+        InstanceType: t2.micro
+        KeyName: burakawskey
+        SecurityGroupIds:
+          - !GetAtt ASG_EC2SG.GroupId
+        UserData: !Base64 |
+          #! /bin/bash
+          yum update -y
+          yum install python3 -y
+          pip3 install flask flask-mysql sqlalchemy flask-SQLAlchemy
+  
+     
+
+
+Outputs:
