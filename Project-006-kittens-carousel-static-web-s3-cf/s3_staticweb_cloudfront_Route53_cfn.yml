@@ -34,7 +34,6 @@ Resources:
     Type: "AWS::CertificateManager::Certificate"
     Properties:
       CertificateTransparencyLoggingPreference: ENABLED 
-
       DomainName: !Ref KittensDomainName 
       DomainValidationOptions:
         - DomainName: !Ref KittensDomainName
@@ -78,7 +77,7 @@ Resources:
         - Name: !Ref KittensDomainName
           Type: A
           AliasTarget:
-            HostedZoneId: Z2FDTNDATAQYW2 
+            HostedZoneId: Z05057391E9DIXYE0P0LR
             DNSName: !GetAtt KittensCloudfront.DomainName
 Outputs:
   BucketName: 
