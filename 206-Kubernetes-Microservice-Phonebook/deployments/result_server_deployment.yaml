@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: result-server
+  labels:
+    name: result-server
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      name: result-pod
+  template:
+    metadata:
+      labels:
+        name: result-pod
+    spec:
+      containers:
+        - name: result-app
+          image: burakkoban/result-server
+          ports:
+            - containerPort: 80
+          env:
+          - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysecret
+                  key: mysql-admin-password
+          envFrom:
+          - configMapRef:
+              name: servers-config
